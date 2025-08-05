@@ -35,7 +35,7 @@ regd_users.post("/login", (req, res) => {
 
     // Save user session info (if needed)
     req.session.authorization = {
-      token,
+      accessToken: token,
       username
     };
 
