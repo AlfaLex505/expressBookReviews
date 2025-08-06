@@ -22,8 +22,19 @@ public_users.post("/register", (req, res) => {
 });
 
 // Get all books
-public_users.get('/', (req, res) => {
-  return res.status(200).json(books);
+public_users.get('/', async (req, res) => {
+  try {
+    const getBooks = () =>
+      new Promise((resolve, reject) => {
+        if (books) resolve(books);
+        else reject("No books available");
+      });
+
+  const bookList = await getBooks();
+  return res.status(200).json(bookList);
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
 });
 
 // Get book by ISBN
