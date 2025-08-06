@@ -56,15 +56,22 @@ public_users.get('/isbn/:isbn', async (req, res) => {
 });
 
 // Get books by author
-public_users.get('/author/:author', (req, res) => {
+public_users.get('/author/:author', async (req, res) => {
   const author = req.params.author;
   const results = Object.values(books).filter(book => book.author.toLowerCase() === author.toLowerCase());
 
-  if (results.length === 0) {
-    return res.status(404).json({ message: "No books found by that author" });
-  }
+  const getBookByAuthor = () =>
+    new Promise((resolve, reject) => {
+      if (results.length > 0) resolve(results);
+      else reject({status: 404, message: "No book available with that Author"});
+  });
 
-  return res.status(200).json(results);
+  try {
+    const BookByAuthor = await getBookByAuthor();
+    return res.status(200).json(BookByAuthor);
+  } catch (error) {
+    return res.status(error.status || 500).json({ message: error.message || error});
+  }
 });
 
 // Get books by title
