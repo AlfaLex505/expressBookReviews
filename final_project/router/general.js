@@ -38,15 +38,21 @@ public_users.get('/', async (req, res) => {
 });
 
 // Get book by ISBN
-public_users.get('/isbn/:isbn', (req, res) => {
+public_users.get('/isbn/:isbn', async (req, res) => {
   const isbn = req.params.isbn;
-  const book = books[isbn];
 
-  if (!book) {
-    return res.status(404).json({ message: "Book not found" });
+  const getBookByISBN = () =>
+    new Promise((resolve, reject) => {
+      if (books[isbn]) resolve(books[isbn]);
+      else reject({status: 404, message: "No book available with that ISBN"});
+  });
+
+  try {
+    const bookByISBN = await getBookByISBN();
+    return res.status(200).json(bookByISBN);
+  } catch (error) {
+    return res.status(error.status || 500).json({ message: error || error});
   }
-
-  return res.status(200).json(book);
 });
 
 // Get books by author
